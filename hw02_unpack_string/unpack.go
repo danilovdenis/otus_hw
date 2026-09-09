@@ -19,7 +19,8 @@ func Unpack(str string) (string, error) {
 	for i := 0; i < len(runes); {
 		var ch rune
 
-		if backslashCode == runes[i] {
+		switch {
+		case backslashCode == runes[i]:
 			if i+1 >= len(runes) {
 				return "", ErrInvalidString
 			}
@@ -32,9 +33,9 @@ func Unpack(str string) (string, error) {
 
 			ch = next
 			i += 2
-		} else if unicode.IsDigit(runes[i]) {
+		case unicode.IsDigit(runes[i]):
 			return "", ErrInvalidString
-		} else {
+		default:
 			ch = runes[i]
 			i++
 		}
