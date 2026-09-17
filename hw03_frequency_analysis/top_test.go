@@ -43,9 +43,20 @@ var text = `Как видите, он  спускается  по  лестни�
 	посидеть у огня и послушать какую-нибудь интересную сказку.
 		В этот вечер...`
 
+var customText = `Кот сидел на окне и смотрел на улицу.
+На улице шел дождь, и кот лениво потягивался.
+В комнате было тепло и уютно, а за окном мокли деревья.
+Кот не любил дождь, но любил наблюдать за каплями.
+Иногда он мяукал, но никто не слышал его.
+Хозяин ушел на работу и оставил кота одного.
+Кот думал о еде и о том, когда вернется хозяин.
+Он видел, как по улице бежала собака, но ему было все равно.
+Вечером хозяин вернулся и погладил кота.
+Кот довольно замурлыкал и уснул у него на коленях.`
+
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
-		require.Len(t, Top10(""), 0)
+		require.Len(t, Top10("", taskWithAsteriskIsCompleted), 0)
 	})
 
 	t.Run("positive test", func(t *testing.T) {
@@ -62,7 +73,22 @@ func TestTop10(t *testing.T) {
 				"кристофер", // 4
 				"не",        // 4
 			}
-			require.Equal(t, expected, Top10(text))
+			require.Equal(t, expected, Top10(text, taskWithAsteriskIsCompleted))
+
+			expected = []string{
+				"и",      // 7
+				"кот",    // 5
+				"на",     // 5
+				"но",     // 3
+				"хозяин", // 3
+				"было",   // 2
+				"дождь",  // 2
+				"за",     // 2
+				"кота",   // 2
+				"любил",  // 2
+			}
+
+			require.Equal(t, expected, Top10(customText, taskWithAsteriskIsCompleted))
 		} else {
 			expected := []string{
 				"он",        // 8
@@ -76,7 +102,22 @@ func TestTop10(t *testing.T) {
 				"не",        // 4
 				"то",        // 4
 			}
-			require.Equal(t, expected, Top10(text))
+			require.Equal(t, expected, Top10(text, taskWithAsteriskIsCompleted))
+
+			expected = []string{
+				"и",      // 7
+				"Кот",    // 4
+				"на",     // 4
+				"но",     // 3
+				"было",   // 2
+				"дождь,", // 2
+				"за",     // 2
+				"любил",  // 2
+				"не",     // 2
+				"о",      // 2
+			}
+
+			require.Equal(t, expected, Top10(customText, taskWithAsteriskIsCompleted))
 		}
 	})
 }
