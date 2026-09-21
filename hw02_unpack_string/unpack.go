@@ -9,7 +9,7 @@ import (
 
 var ErrInvalidString = errors.New("invalid string")
 
-const backslashCode = 92
+const backslashCode = '\\'
 
 func Unpack(str string) (string, error) {
 	var builder strings.Builder
