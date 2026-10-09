@@ -49,14 +49,53 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
-	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+	t.Run("purge by capacity", func(t *testing.T) {
+		c := NewCache(3)
+
+		c.Set("a", 1) // [a]
+		c.Set("b", 2) // [b, a]
+		c.Set("c", 3) // [c, b, a]
+		c.Set("d", 4) // [d, c, b] - "a" вытеснен как самый старый
+
+		_, ok := c.Get("a")
+		require.False(t, ok)
+
+		for _, key := range []Key{"b", "c", "d"} {
+			_, ok = c.Get(key)
+			require.True(t, ok, "key %q should be in cache", key)
+		}
+	})
+
+	t.Run("purge by least recently used", func(t *testing.T) {
+		c := NewCache(3)
+
+		c.Set("a", 1) // [a]
+		c.Set("b", 2) // [b, a]
+		c.Set("c", 3) // [c, b, a]
+
+		c.Get("a")    // [a, c, b] - "b" теперь самый давний
+		c.Set("c", 4) // [c, a, b] - "b" всё ещё самый давний
+
+		c.Set("d", 5) // [d, c, a] - вытесняется "b", а не "a"
+
+		_, ok := c.Get("b")
+		require.False(t, ok)
+
+		val, ok := c.Get("a")
+		require.True(t, ok)
+		require.Equal(t, 1, val)
+
+		val, ok = c.Get("c")
+		require.True(t, ok)
+		require.Equal(t, 4, val)
+
+		val, ok = c.Get("d")
+		require.True(t, ok)
+		require.Equal(t, 5, val)
 	})
 }
 
-func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
-
+func TestCacheMultithreading(_ *testing.T) {
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
